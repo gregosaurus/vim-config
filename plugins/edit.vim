@@ -1,0 +1,6 @@
+Plugin 'Raimondi/delimitMate'
+Plugin 'chenkaie/smarthomekey.vim'
+Plugin 'godlygeek/tabular'
+Plugin 'terryma/vim-multiple-cursors'
+Plugin 'vim-scripts/comments.vim'
+Plugin 'chrisbra/NrrwRgn'

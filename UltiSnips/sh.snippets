@@ -1,0 +1,11 @@
+global !p
+import os
+from datetime import date
+
+def current_year():
+	return date.today().year
+endglobal
+
+snippet mbr "Header"
+# Copyright `!p snip.rv = current_year()` mbr targeting GmbH. All Rights Reserved.
+endsnippet

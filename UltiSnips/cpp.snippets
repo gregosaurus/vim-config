@@ -1,0 +1,175 @@
+global !p
+import os
+from datetime import date
+
+def current_year():
+	return date.today().year
+
+def get_namespaces(file_path=None):
+	if not file_path:
+		file_path = path
+	ns = file_path.split('/')
+	ns = ns[:-1]
+	return ns
+
+def generate_namespace_header():
+	generated = ""
+	ns = get_namespaces()
+	for namespace in ns:
+		generated += """namespace {}
+{{
+""".format(namespace)
+
+	return generated
+
+def generate_namespace_footer():
+	generated = ""
+	ns = get_namespaces()
+	ns.reverse()
+	for namespace in ns:
+		generated += """
+}} // namespace {}""".format(namespace)
+	return generated
+
+def generate_content():
+	fn, ext = os.path.splitext(snip.fn)
+	ext = ext[1:]
+	if ext in ('h', 'hpp', 'hh'):
+		return """class {class_name}
+{{
+public:
+    {class_name}();
+    ~{class_name}();
+private:
+}};""".format(class_name=snip.basename)
+	else:
+		return """{class_name}::{class_name}()
+{{
+}}
+{class_name}::~{class_name}()
+{{
+}}""".format(class_name=snip.basename)
+
+def generate_operators():
+	fn, ext = os.path.splitext(snip.fn)
+	ext = ext[1:]
+	class_name=snip.basename
+	if ext in ('h', 'hpp', 'hh'):
+		return """{class_name}(const {class_name}&);
+		{class_name}({class_name}&&) noexcept;
+		{class_name}& operator=(const {class_name}&);
+		{class_name}& operator=({class_name}&&) noexcept;""".format(class_name=snip.basename)
+	else:
+		return """{class_name}::{class_name}(const {class_name}& rhs)
+{{
+}}
+
+{class_name}::{class_name}({class_name}&& rhs) noexcept
+{{
+}}
+
+{class_name}& {class_name}::operator=(const {class_name}& rhs)
+{{
+}}
+
+{class_name}& {class_name}::operator=({class_name}&& rhs) noexcept
+{{
+}}""".format(class_name=snip.basename)
+
+endglobal
+
+snippet mbr "Header"
+// Copyright `!p snip.rv = current_year()` mbr targeting GmbH. All Rights Reserved.
+endsnippet
+
+snippet bsd "bsd header"
+/*
+ * File: `!p snip.rv = path`
+ * Part of ${1}.
+ *
+ * Distributed under the 3-clause BSD licence (See LICENCE.TXT file at the
+ * project root).
+ *
+ * Copyright (c) `!p snip.rv = current_year()` Thomas Sanchez.  All rights reserved.
+ *
+ */
+endsnippet
+
+snippet ns "Namespace for current file"
+`!p snip.rv = generate_namespace_header()`
+${0:`!p snip.rv = generate_content()`}
+`!p snip.rv = generate_namespace_footer()`
+endsnippet
+
+# Casts
+snippet cast "Static Cast"
+static_cast<${1}>(${2})${3}
+endsnippet
+
+snippet cast "Reinterpret Cast"
+reinterpret_cast<${1}>(${2})${3}
+endsnippet
+
+snippet cast "Dynamic Cast"
+dynamic_cast<${1}>(${2})${3}
+endsnippet
+
+snippet cast "Const Cast"
+const_cast<${1}>(${2})${3}
+endsnippet
+
+snippet dtor "destructor"
+virtual ~${1:`!v Filename('', 'classname')`}();${2}
+endsnippet
+
+snippet can "Add Operators"
+`!p snip.rv = generate_operators()`
+endsnippet
+
+snippet for "std::iterator for-each loop"
+auto it = std::begin(${1:${VISUAL}});
+auto end = std::end(${1:${VISUAL}});
+for (; it != end; ++it)
+{
+	${2}
+}
+endsnippet
+
+snippet each "C++-11 foreach"
+for (auto& ${1:e} : ${2})
+{
+	${3:${VISUAL}}
+}
+endsnippet
+
+snippet ceach "C++-11 const foreach"
+for (const auto& ${1:e} : ${2})
+{
+	${3:${VISUAL}}
+}
+endsnippet
+
+snippet mfun "member function"
+${4:void} ${1:`!v Filename('$1', 'ClassName')`}::${2:memberFunction}(${3})
+{
+	${5:return};
+}
+endsnippet
+
+snippet cout "cout"
+${1:std::}cout << ${2:${VISUAL}} << $1endl;
+endsnippet
+
+snippet scin "scin"
+${1:std::}cin >> ${2};
+endsnippet
+
+snippet log "Rtbp::log"
+RTBP_LOG_TRIVIAL(${1:debug}) << ${2:${VISUAL}};
+endsnippet
+
+snippet log "Boost::log"
+BOOST_LOG_TRIVIAL(${1:debug}) << ${2:${VISUAL}};
+endsnippet
+
+# vim:ft=snippets:
